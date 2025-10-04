@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        maven 'M2_HOME'    // Nom du Maven configuré dans Jenkins
-        jdk 'JAVA_HOME'    // Nom du JDK configuré dans Jenkins
+        maven 'M2_HOME'
+        jdk 'JAVA_HOME'
     }
 
     stages {
@@ -13,15 +13,37 @@ pipeline {
             }
         }
 
+        stage('Prepare') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh 'chmod +x mvnw'
+                    }
+                }
+            }
+        }
+
         stage('Build') {
             steps {
-                sh './mvnw clean install'
+                script {
+                    if (isUnix()) {
+                        sh './mvnw clean install'
+                    } else {
+                        bat 'mvnw.cmd clean install'
+                    }
+                }
             }
         }
 
         stage('Test') {
             steps {
-                sh './mvnw test'
+                script {
+                    if (isUnix()) {
+                        sh './mvnw test'
+                    } else {
+                        bat 'mvnw.cmd test'
+                    }
+                }
             }
         }
 
