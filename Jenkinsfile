@@ -2,8 +2,12 @@ pipeline {
     agent any
 
     tools {
-        maven 'M2_HOME'
-        jdk 'JAVA_HOME'
+        maven 'M2_HOME'   // Nom de ton Maven installé dans Jenkins
+        jdk 'JAVA_HOME'    // Nom de ton JDK installé dans Jenkins
+    }
+
+    environment {
+        SONAR_AUTH_TOKEN = credentials('SONAR_AUTH_TOKEN') // Token SonarQube ajouté dans Jenkins Credentials
     }
 
     stages {
@@ -47,6 +51,20 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') { // Nom de ton serveur SonarQube configuré dans Jenkins
+                    script {
+                        if (isUnix()) {
+                            sh "./mvnw sonar:sonar -Dsonar.projectKey=TP-Projet -Dsonar.projectName=\"tp_projet_db\" -Dsonar.login=$SONAR_AUTH_TOKEN"
+                        } else {
+                            bat "mvnw.cmd sonar:sonar -Dsonar.projectKey=TP-Projet -Dsonar.projectName=\"tp_projet_db\" -Dsonar.login=%SONAR_AUTH_TOKEN%"
+                        }
+                    }
+                }
+            }
+        }
+
         stage('Archive Artifacts') {
             steps {
                 archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
@@ -56,10 +74,10 @@ pipeline {
 
     post {
         success {
-            echo 'Build succeeded!'
+            echo 'Build TP-Projet succeeded!'
         }
         failure {
-            echo 'Build failed!'
+            echo 'Build TP-Projet failed!'
         }
     }
 }
