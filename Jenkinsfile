@@ -7,7 +7,9 @@ pipeline {
     }
 
     environment {
-        SONAR_AUTH_TOKEN = credentials('SONAR_AUTH_TOKEN') // Ton token SonarQube
+        // Utiliser l'ID exact du credential dans Jenkins
+        SONAR_AUTH_TOKEN = credentials('nour') 
+        // Si tu as gardé l'ID "nour" dans Jenkins, remplace par: credentials('nour')
     }
 
     stages {
@@ -53,7 +55,7 @@ pipeline {
 
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') { // Nom de ton serveur SonarQube
+                withSonarQubeEnv('SonarQube') { // Nom exact du serveur SonarQube configuré dans Jenkins
                     script {
                         if (isUnix()) {
                             sh "./mvnw sonar:sonar -Dsonar.projectKey=TP-Projet -Dsonar.projectName=\"tp_projet_db\" -Dsonar.login=$SONAR_AUTH_TOKEN"
