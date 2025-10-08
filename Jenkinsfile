@@ -21,7 +21,8 @@ pipeline {
             steps {
                 script {
                     if (isUnix()) {
-                        sh './mvnw clean install -DskipTests=false -Ptest'
+                        // Forcer les permissions pour mvnw avant de lancer Maven
+                        sh 'chmod +x mvnw && ./mvnw clean install -DskipTests=false -Ptest'
                     } else {
                         bat 'mvnw.cmd clean install -DskipTests=false -Ptest'
                     }
