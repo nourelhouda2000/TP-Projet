@@ -2,13 +2,12 @@ pipeline {
     agent any
 
     tools {
-        maven 'M2_HOME'   // Nom de ton Maven installé dans Jenkins
-        jdk 'JAVA_HOME'    // Nom de ton JDK installé dans Jenkins
+        maven 'M2_HOME'
+        jdk 'JAVA_HOME'
     }
 
     environment {
-        // Utiliser l'ID exact du credential dans Jenkins
-        SONAR_AUTH_TOKEN = credentials('SONAR_AUTH_TOKEN') 
+        SONAR_AUTH_TOKEN = credentials('SONAR_AUTH_TOKEN')
     }
 
     stages {
@@ -18,35 +17,13 @@ pipeline {
             }
         }
 
-        stage('Prepare') {
+        stage('Build & Test') {
             steps {
                 script {
                     if (isUnix()) {
-                        sh 'chmod +x mvnw'
-                    }
-                }
-            }
-        }
-
-        stage('Build') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh './mvnw clean install'
+                        sh './mvnw clean install -DskipTests=false -Ptest'
                     } else {
-                        bat 'mvnw.cmd clean install'
-                    }
-                }
-            }
-        }
-
-        stage('Test') {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh './mvnw test'
-                    } else {
-                        bat 'mvnw.cmd test'
+                        bat 'mvnw.cmd clean install -DskipTests=false -Ptest'
                     }
                 }
             }
@@ -55,7 +32,7 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withCredentials([string(credentialsId: 'SONAR_AUTH_TOKEN', variable: 'SONAR_TOKEN')]) {
-                    withSonarQubeEnv('nour') { // Nom exact de ton installation SonarQube dans Jenkins
+                    withSonarQubeEnv('nour') {
                         script {
                             if (isUnix()) {
                                 sh "./mvnw sonar:sonar -Dsonar.projectKey=TP-Projet -Dsonar.projectName=tp_projet_db -Dsonar.login=$SONAR_TOKEN"
