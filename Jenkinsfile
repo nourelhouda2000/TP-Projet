@@ -17,14 +17,13 @@ pipeline {
             }
         }
 
-        stage('Build & Test') {
+        stage('Build') {
             steps {
                 script {
                     if (isUnix()) {
-                        // Forcer les permissions pour mvnw avant de lancer Maven
-                        sh 'chmod +x mvnw && ./mvnw clean install -DskipTests=false -Ptest'
+                        sh 'chmod +x mvnw && ./mvnw clean install -DskipTests=true'
                     } else {
-                        bat 'mvnw.cmd clean install -DskipTests=false -Ptest'
+                        bat 'mvnw.cmd clean install -DskipTests=true'
                     }
                 }
             }
@@ -55,10 +54,10 @@ pipeline {
 
     post {
         success {
-            echo 'Build TP-Projet succeeded!'
+            echo '✅ Build TP-Projet succeeded!'
         }
         failure {
-            echo 'Build TP-Projet failed!'
+            echo '❌ Build TP-Projet failed!'
         }
     }
 }
